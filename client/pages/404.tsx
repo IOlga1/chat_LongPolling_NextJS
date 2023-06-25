@@ -1,7 +1,7 @@
 const NotFoundPage = () => {
   return (
     <div>
-      XXXXXX
+      My custom 404
     </div>
   );
 };
