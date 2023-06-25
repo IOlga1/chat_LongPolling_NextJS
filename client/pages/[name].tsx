@@ -11,36 +11,27 @@ interface IMessage {
 export type TMessagesHistory = Array<IMessage>;
 
 interface IChatProps {
-  messages: TMessagesHistory;
+  history: TMessagesHistory;
 }
 
-const Chat = () => {
+const Chat = ({ history }: IChatProps) => {
   const [newMessage, setNewMessage] = useState('');
-  const [messages, setMessages] = useState<TMessagesHistory | []>([]);
+  const [messages, setMessages] = useState<TMessagesHistory | []>(history);
   const router = useRouter();
   const author = router.query.name;
 
   useEffect(() => {
-
-    const fetchHistory = async () => {
-      const history = await DataService.getMessagesHistory();
-      setMessages(history);
-    };
-
     const subscribe = async () => {
       const newMessages = await DataService.subscribe();
       setMessages(newMessages);
       subscribe();
     };
-
-    fetchHistory();
     subscribe();
   }, []);
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (newMessage) {
-      // Отправить соощение в чат
       const fetchData = async () => {
         const sendResult = await DataService.sendMessage({
           author: author as string,
@@ -76,5 +67,14 @@ const Chat = () => {
     </div>
   );
 };
+
+export async function getServerSideProps() {
+  const history = await DataService.getMessagesHistory();
+  return {
+    props: {
+      history,
+    }
+  }
+}
 
 export default Chat;
